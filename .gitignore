@@ -4,3 +4,4 @@ Scripts
 pip-selfcheck.json
 pyvenv.cfg
 __pycache__
+Thumbs.db
