@@ -7,7 +7,7 @@ import math
 # Quick note: program only works on windows
 
 game_started = False
-mode = "defautl"
+mode = "default"
 DEFAULT_GAME_WIDTH = 1000
 DEFAULT_GAME_HEIGHT = 750
 DEFAULT_CELL_WIDTH = 5
