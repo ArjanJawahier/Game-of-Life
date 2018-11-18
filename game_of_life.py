@@ -12,13 +12,16 @@ DEFAULT_GAME_WIDTH = 1000
 DEFAULT_GAME_HEIGHT = 750
 DEFAULT_CELL_WIDTH = 5
 DEFAULT_CELL_HEIGHT = 5
-DEFAULT_CELL_MARGIN = 1
+DEFAULT_CELL_MARGIN = 0
 
-game_of_life_width = 1000
-game_of_life_height = 750
-cell_width = 5
-cell_height = 5
-cell_margin = 0
+game_of_life_width = DEFAULT_GAME_WIDTH
+game_of_life_height = DEFAULT_GAME_HEIGHT
+cell_width = DEFAULT_CELL_WIDTH
+cell_height = DEFAULT_CELL_HEIGHT
+cell_margin = DEFAULT_CELL_MARGIN
+
+grid_width = int(game_of_life_width / (cell_width + cell_margin))
+grid_height = int(game_of_life_height / (cell_height + cell_margin))
 
 grid_cells = []
 
@@ -102,7 +105,6 @@ def reset_game_of_life():
     for cell in grid_cells:
         cell.reset_to_defaults()
 
-
 def set_default_mode():
     global mode
     mode = "default"
@@ -110,6 +112,15 @@ def set_default_mode():
 def set_bacteria_mode():
     global mode
     mode = "bacteria"
+
+def initcond_outer_edge():
+    left_edge_x = grid_cells[0].x
+    top_edge_y = grid_cells[0].y
+    right_edge_x = grid_cells[-1].x
+    bottom_edge_y = grid_cells[-1].y
+    for cell in grid_cells:
+        if cell.x == left_edge_x or cell.x == right_edge_x or cell.y == top_edge_y or cell.y == bottom_edge_y:
+            cell.set_alive()
 
 def zoom(grid_width, grid_height, grid_mouse_column, grid_mouse_row, size_change, screen):
     global cell_width
@@ -141,26 +152,28 @@ def main():
     pygameframe.pack(side = tk.BOTTOM)
     uiframe =  tk.Frame(root)
     uiframe.pack()
+    initial_conditions_frame = tk.Frame(root)
+    initial_conditions_frame.pack(side = tk.RIGHT)
     os.environ['SDL_WINDOWID'] = str(pygameframe.winfo_id())
     os.environ['SDL_VIDEODRIVER'] = 'windib'    # Windows driver
     screen = pygame.display.set_mode((game_of_life_width, game_of_life_height))
     screen.fill(pygame.Color(10, 10, 10)) # dark-greyish background colour
 
+    #uiframe buttons
     start_button = tk.Button(uiframe, text = "Start", command=start_game_of_life)
     start_button.pack(side = tk.LEFT)
     pause_button = tk.Button(uiframe, text = "Pause", command=pause_game_of_life)
     pause_button.pack(side=tk.LEFT)
     reset_button = tk.Button(uiframe, text="Reset", command=reset_game_of_life)
     reset_button.pack(side=tk.LEFT)
-    menubar = tk.Menu(root)
-    mode_menu = tk.Menu(menubar, tearoff=0) # menu button for choosing the program mode
-    mode_menu.add_command(label="Default Game of Life", command=set_default_mode)
-    mode_menu.add_command(label="Bacteria (cells get evaluated in order)", command=set_bacteria_mode)
-    menubar.add_cascade(label="Mode", menu=mode_menu)
-    root.config(menu=menubar)
+    default_button = tk.Button(uiframe, text = "Default Game of Life", command = set_default_mode)
+    default_button.pack(side = tk.LEFT)
+    bacteria_button = tk.Button(uiframe, text = "Bacteria (cells get evaluated in order)", command = set_bacteria_mode)
+    bacteria_button.pack(side=tk.LEFT)
 
-    grid_width = int(game_of_life_width / (cell_width + cell_margin))
-    grid_height = int(game_of_life_height / (cell_height + cell_margin))
+    #initial_conditions_frame buttons
+    outer_edge_only_button = tk.Button(initial_conditions_frame, text = "Outer edge", command = initcond_outer_edge)
+    outer_edge_only_button.pack(side=tk.TOP)
 
     pygame.display.init()
     create_grid(cell_width, cell_height, cell_margin, grid_width, grid_height, screen)
@@ -174,7 +187,6 @@ def main():
                 update_game_of_life_default(grid_width, grid_height)
             elif mode == "bacteria":
                 update_game_of_life_bacteria(grid_width, grid_height)
-
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 2:

@@ -21,7 +21,12 @@ class Cell():
     def set_alive(self):
         if self.state != "alive":
             self.state = "alive"
-            self.color = (random.randint(0, 255),0,random.randint(0, 255))
+            w, h = pygame.display.get_surface().get_size()
+            r = abs((self.x%w)/w)*255
+            g = (1-abs((self.y%h)/h))*255
+            b = 255
+            self.color = (r, g, b)
+            # self.color = (random.randint(0, 255),0,random.randint(0, 255))
             # self.color = (255, 255, 255)
             pygame.draw.rect(self.screen, self.color, (self.x, self.y, self.width, self.height))
 
